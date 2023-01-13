@@ -1,0 +1,268 @@
+---
+title: "final proj"
+output: html_document
+---
+
+```{r}
+library(ggplot2)
+raw.data <- read.csv("kaggle_survey_2020_responses.csv", header = TRUE)
+raw.data <- raw.data[-1,]
+raw.data[raw.data == ""] <- NA
+
+#getting rid of the skewness
+raw.data[raw.data == "$0-999"] <- NA
+
+data <- na.omit(raw.data[,c("Q4","Q24")])
+income <- data$Q24
+edu <- data$Q4
+length(edu)
+length(income)
+
+
+
+```
+
+
+
+```{r}
+sum(edu == "Doctoral degree")
+sum(edu == "Masterâ€™s degree")
+sum(edu == "Bachelorâ€™s degree")
+sum(edu == "No formal education past high school")
+sum(edu == "Some college/university study without earning a bachelorâ€™s degree")
+sum(edu == "Professional degree")
+sum(edu == "I prefer not to answer")
+
+
+```
+
+
+
+
+
+
+```{r}
+layout <- layout(matrix(c(1,1,
+                          2,2), nr = 2, byrow = T))
+
+#ordering income from decreasing to increading order, to plot the histogram
+income.counts <- rev(sort(table(income)))
+order_ind <- c("$0-999","1,000-1,999", "2,000-2,999", "3,000-3,999", "4,000-4,999", "5,000-7,499", "7,500-9,999", 
+               "10,000-14,999", "15,000-19,999", "20,000-24,999", "25,000-29,999", "30,000-39,999", "40,000-49,999",
+               "50,000-59,999", "60,000-69,999", "70,000-79,999", "80,000-89,999", "90,000-99,999", "100,000-124,999",
+               "125,000-149,999", "150,000-199,999", "200,000-249,999", "250,000-299,999", "300,000-500,000", "> $500,000")
+
+income.counts <- income.counts[order_ind]
+barplot(income.counts, main = "Income")
+
+# #checking normality of income
+# plot(ecdf(income.counts), do.points = F, verticals = T, main = "ecdf of income")
+# x <- seq(min(income.counts)-4, max(income.counts), length.out = 1000)
+# lines(x, pnorm(x, mean=mean(income.counts), sd=sd(income.counts)), lty=3, col = 2)
+# 
+# #plotting a histogram for education where masters = 0, BA = 1, DR = 2, some = 3, phd = 4, pref = 5, none = 6
+edu.counts <- rev(sort(table(edu)))
+edu.order <- c("I prefer not to answer", "No formal education past high school",
+               "Some college/university study without earning a bachelorâ€™s degree", "Bachelorâ€™s degree", "Masterâ€™s degree",                   "Doctoral degree", "Professional degree")
+edu.counts <- edu.counts[edu.order]
+# barplot(edu.counts, names.arg=c("No response","None","Some","BA","MA", "DR", "PhD"), main = "Education past High School")
+# 
+# plot(ecdf(edu.counts), do.points = F, verticals = T, main = "ecdf of education")
+# x <- seq(min(edu.counts)-4, max(edu.counts), length.out = 1000)
+# lines(x, pnorm(x, mean=mean(edu.counts), sd=sd(edu.counts)), lty=3, col = 2)
+
+```
+
+```{r}
+#masters that make less and more than 100k
+masters.ind = which(data['Q4'] == "Masterâ€™s degree")
+ma.ls <- (length(which(income[masters.ind] == "$0-999")) + length(which(income[masters.ind] == "1,000-1,999")) + 
+            length(which(income[masters.ind] == "2,000-2,999")) + length(which(income[masters.ind] == "3,000-3,999")) + 
+            length(which(income[masters.ind] == "4,000-4,999")) + length(which(income[masters.ind] == "5,000-7,499")) + 
+            length(which(income[masters.ind] == "7,500-9,999")) + length(which(income[masters.ind] ==  "10,000-14,999")) + 
+            length(which(income[masters.ind] == "15,000-19,999")) + length(which(income[masters.ind] == "20,000-24,999")) + 
+            length(which(income[masters.ind] == "25,000-29,999")) + length(which(income[masters.ind] == "30,000-39,999")) + 
+            length(which(income[masters.ind] == "40,000-49,999")) + length(which(income[masters.ind] == "50,000-59,999")) + 
+            length(which(income[masters.ind] == "60,000-69,999")) + length(which(income[masters.ind] == "70,000-79,999")) + 
+            length(which(income[masters.ind] == "80,000-89,999")) + length(which(income[masters.ind] == "90,000-99,999")))
+
+ma.gr <- (length(which(income[masters.ind] == "100,000-124,999")) + length(which(income[masters.ind] == "125,000-149,999"))+ 
+        length(which(income[masters.ind] == "150,000-199,999")) + length(which(income[masters.ind] == "200,000-249,999")) + 
+        length(which(income[masters.ind] == "250,000-299,999")) + length(which(income[masters.ind] == "300,000-500,000")) + 
+        length(which(income[masters.ind] == "> $500,000")))
+
+#BAs that make less and more than 100k
+bachs.ind = which(data['Q4'] == "Bachelorâ€™s degree")
+bach.ls <- (length(which(income[bachs.ind] == "$0-999")) + length(which(income[bachs.ind] == "1,000-1,999")) + 
+            length(which(income[bachs.ind] == "2,000-2,999")) + length(which(income[bachs.ind] == "3,000-3,999")) + 
+            length(which(income[bachs.ind] == "4,000-4,999")) + length(which(income[bachs.ind] == "5,000-7,499")) + 
+            length(which(income[bachs.ind] == "7,500-9,999")) + length(which(income[bachs.ind] ==  "10,000-14,999")) + 
+            length(which(income[bachs.ind] == "15,000-19,999")) + length(which(income[bachs.ind] == "20,000-24,999")) + 
+            length(which(income[bachs.ind] == "25,000-29,999")) + length(which(income[bachs.ind] == "30,000-39,999")) + 
+            length(which(income[bachs.ind] == "40,000-49,999")) + length(which(income[bachs.ind] == "50,000-59,999")) + 
+            length(which(income[bachs.ind] == "60,000-69,999")) + length(which(income[bachs.ind] == "70,000-79,999")) + 
+            length(which(income[bachs.ind] == "80,000-89,999")) + length(which(income[bachs.ind] == "90,000-99,999")))
+
+bach.gr <- (length(which(income[bachs.ind] == "100,000-124,999")) + length(which(income[bachs.ind] == "125,000-149,999"))+ 
+        length(which(income[bachs.ind] == "150,000-199,999")) + length(which(income[bachs.ind] == "200,000-249,999")) + 
+        length(which(income[bachs.ind] == "250,000-299,999")) + length(which(income[bachs.ind] == "300,000-500,000")) + 
+        length(which(income[bachs.ind] == "> $500,000")))
+
+#R that make more than 100k
+r.ind <- which(raw.data['Q7_Part_2'] == "R")
+r.ls <- (length(which(income[r.ind] == "$0-999")) + length(which(income[r.ind] == "1,000-1,999")) + 
+            length(which(income[r.ind] == "2,000-2,999")) + length(which(income[r.ind] == "3,000-3,999")) + 
+            length(which(income[r.ind] == "4,000-4,999")) + length(which(income[r.ind] == "5,000-7,499")) + 
+            length(which(income[r.ind] == "7,500-9,999")) + length(which(income[r.ind] ==  "10,000-14,999")) + 
+            length(which(income[r.ind] == "15,000-19,999")) + length(which(income[r.ind] == "20,000-24,999")) + 
+            length(which(income[r.ind] == "25,000-29,999")) + length(which(income[r.ind] == "30,000-39,999")) + 
+            length(which(income[r.ind] == "40,000-49,999")) + length(which(income[r.ind] == "50,000-59,999")) + 
+            length(which(income[r.ind] == "60,000-69,999")) + length(which(income[r.ind] == "70,000-79,999")) + 
+            length(which(income[r.ind] == "80,000-89,999")) + length(which(income[r.ind] == "90,000-99,999")))
+
+r.gr <- (length(which(income[r.ind] == "100,000-124,999")) + length(which(income[r.ind] == "125,000-149,999"))+ 
+        length(which(income[r.ind] == "150,000-199,999")) + length(which(income[r.ind] == "200,000-249,999")) + 
+        length(which(income[r.ind] == "250,000-299,999")) + length(which(income[r.ind] == "300,000-500,000")) + 
+        length(which(income[r.ind] == "> $500,000")))
+
+#python less and more than 100k
+pyth.ind <- which(raw.data['Q7_Part_1'] == "Python")
+pyth.ls <- (length(which(income[pyth.ind] == "$0-999")) + length(which(income[pyth.ind] == "1,000-1,999")) + 
+            length(which(income[pyth.ind] == "2,000-2,999")) + length(which(income[pyth.ind] == "3,000-3,999")) + 
+            length(which(income[pyth.ind] == "4,000-4,999")) + length(which(income[pyth.ind] == "5,000-7,499")) + 
+            length(which(income[pyth.ind] == "7,500-9,999")) + length(which(income[pyth.ind] ==  "10,000-14,999")) + 
+            length(which(income[pyth.ind] == "15,000-19,999")) + length(which(income[pyth.ind] == "20,000-24,999")) + 
+            length(which(income[pyth.ind] == "25,000-29,999")) + length(which(income[pyth.ind] == "30,000-39,999")) + 
+            length(which(income[pyth.ind] == "40,000-49,999")) + length(which(income[pyth.ind] == "50,000-59,999")) + 
+            length(which(income[pyth.ind] == "60,000-69,999")) + length(which(income[pyth.ind] == "70,000-79,999")) + 
+            length(which(income[pyth.ind] == "80,000-89,999")) + length(which(income[pyth.ind] == "90,000-99,999")))
+
+pyth.gr <- (length(which(income[pyth.ind] == "100,000-124,999")) + length(which(income[pyth.ind] == "125,000-149,999"))+ 
+        length(which(income[pyth.ind] == "150,000-199,999")) + length(which(income[pyth.ind] == "200,000-249,999")) + 
+        length(which(income[pyth.ind] == "250,000-299,999")) + length(which(income[pyth.ind] == "300,000-500,000")) + 
+        length(which(income[pyth.ind] == "> $500,000")))
+
+
+```
+
+
+
+```{r Point estimate and interval estimate for the fraction of respondents who have a master and those with BA}
+n <- nrow(data)
+masters <- which(edu == "Masterâ€™s degree")
+pHat.masters <- length(masters)/length(edu)
+pHat.masters
+width <- 1.96 * sqrt((pHat.masters*(1-pHat.masters))/n)
+interval.masters <- c(pHat.masters - width, pHat.masters + width)
+interval.masters
+
+BA <- which(edu == "Bachelorâ€™s degree")
+pHat.BA <- length(BA)/length(edu)
+pHat.BA
+width <- 1.96 * sqrt((pHat.BA*(1-pHat.BA))/n)
+interval.BA <- c(pHat.BA - width, pHat.BA + width)
+interval.BA
+
+```
+
+```{r transforming salary into a continous variable}
+set.seed(200)
+simulation <- function(x,y,z){
+  data1 <- runif(z,x,y)
+  data1
+}    
+
+# int.1 <- simulation(0, 999, 2128)
+int.2 <- simulation(1000, 1999, 581)
+int.3 <- simulation(2000, 2999, 330)
+int.4 <- simulation(3000, 3999, 264)
+int.5 <- simulation(4000, 4999, 279)
+int.6 <- simulation(5000, 7499, 488)
+int.7 <- simulation(7500, 9999, 371)
+int.8 <- simulation(10000, 14999, 665)
+int.9 <- simulation(15000, 19999, 449)
+int.10 <- simulation(20000, 24999, 404)
+int.11 <- simulation(25000, 29999, 310)
+int.12 <- simulation(30000, 39999, 540)
+int.13 <- simulation(40000, 49999, 552)
+int.14 <- simulation(50000, 59999, 510)
+int.15 <- simulation(60000, 69999, 408)
+int.16 <- simulation(70000, 79999, 394)
+int.17 <- simulation(80000, 89999, 273)
+int.18 <- simulation(90000, 99999, 280)
+int.19 <- simulation(100000, 124999, 573)
+int.20 <- simulation(125000, 149999, 315)
+int.21 <- simulation(150000, 199999, 347)
+int.22 <- simulation(200000, 249999, 115)
+int.23 <- simulation(250000, 299999, 48)
+int.24 <- simulation(300000, 500000, 55)
+int.25 <- simulation(500000, 1000000, 50)
+
+
+
+
+#int.1 <- simulation(log(1), log(999), 2128)
+# int.2 <- simulation(log(1000), log(1999), 581)
+# int.3 <- simulation(log(2000), log(2999), 330)
+# int.4 <- simulation(log(3000), log(3999), 264)
+# int.5 <- simulation(log(4000), log(4999), 279)
+# int.6 <- simulation(log(5000), log(7499), 488)
+# int.7 <- simulation(log(7500), log(9999), 371)
+# int.8 <- simulation(log(10000), log(14999), 665)
+# int.9 <- simulation(log(15000), log(19999), 449)
+# int.10 <- simulation(log(20000), log(24999), 404)
+# int.11 <- simulation(log(25000), log(29999), 310)
+# int.12 <- simulation(log(30000), log(39999), 540)
+# int.13 <- simulation(log(40000), log(49999), 552)
+# int.14 <- simulation(log(50000), log(59999), 510)
+# int.15 <- simulation(log(60000), log(69999), 408)
+# int.16 <- simulation(log(70000), log(79999), 394)
+# int.17 <- simulation(log(80000), log(89999), 273)
+# int.18 <- simulation(log(90000), log(99999), 280)
+# int.19 <- simulation(log(100000), log(124999), 573)
+# int.20 <- simulation(log(125000), log(149999), 315)
+# int.21 <- simulation(log(150000), log(199999), 347)
+# int.22 <- simulation(log(200000), log(249999), 115)
+# int.23 <- simulation(log(250000), log(299999), 48)
+# int.24 <- simulation(log(300000), log(500000), 55)
+# int.25 <- simulation(log(500000), log(1000000), 50)
+
+
+final.income <- c(int.2, int.3, int.4, int.5, int.6, int.7, int.8, int.9, int.10, int.11,
+                 int.12, int.13, int.14, int.15, int.16, int.17, int.18, int.19, int.20,
+                 int.21, int.22, int.23, int.24, int.25)
+
+
+```
+
+
+```{r}
+factor.edu <- as.factor(edu.counts)
+
+layout <- layout(matrix(c(1,1,
+                          2,3), nr = 2, byrow = T))
+#plot(1:length(final.income),final.income,type="l")
+
+fit <- lm(final.income~edu)
+anova(fit)
+plot(fit)
+summary(fit)
+
+```
+
+
+
+```{r proportions z test}
+x <- nrow(subset(data, edu == "Masterâ€™s degree" & income == "100,000-124,999"))
+y <- nrow(subset(data, edu == "Bachelorâ€™s degree" & income == "100,000-124,999"))
+n = 573
+
+z.stat <- qnorm(0.01, lower = F)
+p.m <- x/n
+p.b <- y/n
+
+
+(p.m - p.b) - z.stat * sqrt( ((p.m*(1-p.m))/n) + ((p.b*(1-p.b))/n) )
+(p.m - p.b) + z.stat * sqrt( ((p.m*(1-p.m))/n) + ((p.b*(1-p.b))/n) )
+```
+
